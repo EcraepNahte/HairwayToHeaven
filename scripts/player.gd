@@ -13,9 +13,13 @@ var displacement: float = 0.0
 var y_velocity: float = 0.0
 var falling: bool = false
 var fall_timer: float = 0.0
+var active = true
 
 
 func _physics_process(delta: float) -> void:
+	if not active:
+		return
+	
 	if falling:
 		handle_falling(delta)
 	else:
@@ -45,11 +49,13 @@ func handle_falling(delta):
 	fall_timer += delta
 	velocity.y = fall_speed
 	
+	var horizontal_speed = fall_timer / fall_duration * fall_horizontal_speed
+	
 	# Move towards x = 0
 	if position.x > 0:
-		velocity.x = -fall_horizontal_speed
+		velocity.x = -horizontal_speed
 	elif position.x < 0:
-		velocity.x = fall_horizontal_speed
+		velocity.x = horizontal_speed
 	else:
 		velocity.x = 0
 	
@@ -61,4 +67,8 @@ func handle_falling(delta):
 func fall():
 	if not falling:
 		falling = true
-	
+		$AudioStreamPlayer2D.play()
+
+
+func on_game_over():
+	active = false
